@@ -297,7 +297,7 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
     if not (p.returncode is None):
         raise RuntimeError(
             'Pandoc died with exitcode "%s" before receiving input: %s' % (p.returncode,
-                                                                           p.stderr.read())
+                                                                           p.stderr.read().decode('utf-8'))
         )
 
     try:
@@ -318,17 +318,18 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
         # this shouldn't happen: pandoc more or less garantees that the output is utf-8!
         raise RuntimeError('Pandoc output was not utf-8.')
 
+    try:
+        stderr = stderr.decode('utf-8')
+    except UnicodeDecodeError:
+        # this shouldn't happen: pandoc more or less garantees that the output is utf-8!
+        raise RuntimeError('Pandoc error output was not utf-8.')
+
     # check that pandoc returned successfully
     if p.returncode != 0:
         raise RuntimeError(
             'Pandoc died with exitcode "%s" during conversion: %s' % (p.returncode, stderr)
         )
 
-    try:
-        stderr = stderr.decode('utf-8')
-    except UnicodeDecodeError:
-        # this shouldn't happen: pandoc more or less garantees that the output is utf-8!
-        raise RuntimeError('Pandoc error output was not utf-8.')
 
     # So I can still easily debug my filters
     print(stderr, file=sys.stderr)
