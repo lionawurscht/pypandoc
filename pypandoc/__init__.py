@@ -324,6 +324,15 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
             'Pandoc died with exitcode "%s" during conversion: %s' % (p.returncode, stderr)
         )
 
+    try:
+        stderr = stderr.decode('utf-8')
+    except UnicodeDecodeError:
+        # this shouldn't happen: pandoc more or less garantees that the output is utf-8!
+        raise RuntimeError('Pandoc error output was not utf-8.')
+
+    # So I can still easily debug my filters
+    print(stderr, file=sys.stderr)
+
     # if there is an outputfile, then stdout is likely empty!
     return stdout
 
