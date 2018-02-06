@@ -327,7 +327,8 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
     # check that pandoc returned successfully
     if p.returncode != 0:
         raise RuntimeError(
-            'Pandoc died with exitcode "%s" during conversion: %s' % (p.returncode, stderr)
+            'Pandoc died with exitcode "%s" during conversion: %s' % (p.returncode, stderr),
+            stderr
         )
 
 
